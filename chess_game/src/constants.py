@@ -65,7 +65,18 @@ PIECE_VALUES = {
 
 # Rendering options
 USE_BACKGROUND_CIRCLES = False  # Set to True for background circle rendering, False for outline rendering
-USE_ASCII_PIECES = True         # Set to False for Unicode chess symbols, True for ASCII letters
+USE_ASCII_PIECES = False        # Set to False for Unicode chess symbols, True for ASCII letters
+
+# Font preferences for Unicode support (macOS optimized)
+PREFERRED_UNICODE_FONTS = [
+    'Apple Symbols',           # Best macOS font for chess symbols
+    'Apple Color Emoji',       # Fallback with emoji support
+    'SF Pro Display',          # Apple system font
+    'Arial Unicode MS',        # Microsoft Unicode font
+    'DejaVu Sans',            # Open source Unicode font
+    'Menlo',                  # macOS monospace with Unicode
+    'Arial',                  # Basic fallback
+]
 
 # UI Layout Constants
 UI_MARGIN = 20

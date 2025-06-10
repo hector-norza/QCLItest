@@ -10,63 +10,85 @@ class Renderer:
         self.screen = screen
         self.clock = pygame.time.Clock()
         self.animation_time = 0
-        
-        # Load fonts with fallbacks
+        self.unicode_font_name = None
         self.unicode_supported = False
-        self.piece_font = None
         
-        # Try fonts known to support Unicode chess symbols (macOS optimized)
-        chess_fonts = [
-            'Apple Symbols',         # macOS system font with excellent symbol support
-            'Arial Unicode MS',      # Available on macOS
-            'Lucida Grande',         # macOS default with Unicode support
-            'SF Pro Display',        # Apple's system font
-            'Helvetica',             # macOS standard
-            'DejaVu Sans',           # If installed via Homebrew
-            'Noto Sans',             # Google's Unicode font
-            'Times New Roman',       # Fallback with some Unicode
-            'Arial',                 # Basic fallback
-        ]
+        # Test and load the best Unicode font
+        self.unicode_font_name = self._find_best_unicode_font()
         
-        # Test each font for Unicode chess symbol support
-        for font_name in chess_fonts:
+        # Load fonts based on Unicode support
+        if self.unicode_font_name and not USE_ASCII_PIECES:
+            self._load_unicode_fonts()
+            print(f"✅ Using Unicode chess symbols with font: {self.unicode_font_name}")
+        else:
+            self._load_fallback_fonts()
+            print("ℹ️  Using ASCII letters for chess pieces")
+        
+        # Define piece symbols
+        self._setup_piece_symbols()
+        
+        # Create surfaces for smooth rendering
+        self.board_surface = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
+        self.ui_surface = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
+    
+    def _find_best_unicode_font(self):
+        """Find the best font for Unicode chess symbols"""
+        if USE_ASCII_PIECES:
+            return None
+            
+        test_symbol = '♔'  # White king symbol
+        
+        for font_name in PREFERRED_UNICODE_FONTS:
             try:
+                # Try to load the font
                 test_font = pygame.font.SysFont(font_name, 24, bold=True)
-                if test_font:
-                    # Test if it can render chess symbols properly
-                    test_surface = test_font.render('♔', True, (255, 255, 255))
-                    if test_surface.get_width() > 10:  # If it renders with reasonable width
-                        # This font works! Use it for all text
-                        self.title_font = pygame.font.SysFont(font_name, TITLE_FONT_SIZE, bold=True)
-                        self.subtitle_font = pygame.font.SysFont(font_name, SUBTITLE_FONT_SIZE, bold=True)
-                        self.body_font = pygame.font.SysFont(font_name, BODY_FONT_SIZE)
-                        self.small_font = pygame.font.SysFont(font_name, SMALL_FONT_SIZE)
-                        self.piece_font = pygame.font.SysFont(font_name, int(SQUARE_SIZE * 0.8), bold=True)
-                        self.unicode_supported = True
-                        print(f"✅ Unicode chess symbols supported with font: {font_name}")
-                        break
-            except:
+                if test_font is None:
+                    continue
+                
+                # Test if it can render chess symbols
+                test_surface = test_font.render(test_symbol, True, (255, 255, 255))
+                
+                # Check if it rendered properly (width > 8 pixels means it's not just a tiny fallback)
+                if test_surface.get_width() > 8:
+                    self.unicode_supported = True
+                    return font_name
+                    
+            except Exception:
                 continue
         
-        # Fallback if no Unicode support found
-        if not self.unicode_supported:
-            print("⚠️  Unicode chess symbols not supported, using ASCII letters")
-            try:
-                self.title_font = pygame.font.SysFont('Arial', TITLE_FONT_SIZE, bold=True)
-                self.subtitle_font = pygame.font.SysFont('Arial', SUBTITLE_FONT_SIZE, bold=True)
-                self.body_font = pygame.font.SysFont('Arial', BODY_FONT_SIZE)
-                self.small_font = pygame.font.SysFont('Arial', SMALL_FONT_SIZE)
-                self.piece_font = pygame.font.SysFont('Arial', int(SQUARE_SIZE * 0.8), bold=True)
-            except:
-                # Final fallback to default font
-                self.title_font = pygame.font.Font(None, TITLE_FONT_SIZE)
-                self.subtitle_font = pygame.font.Font(None, SUBTITLE_FONT_SIZE)
-                self.body_font = pygame.font.Font(None, BODY_FONT_SIZE)
-                self.small_font = pygame.font.Font(None, SMALL_FONT_SIZE)
-                self.piece_font = pygame.font.Font(None, int(SQUARE_SIZE * 0.8))
-        
-        # ASCII piece symbols for maximum compatibility
-        self.piece_symbols = {
+        return None
+    
+    def _load_unicode_fonts(self):
+        """Load fonts optimized for Unicode chess symbols"""
+        try:
+            self.title_font = pygame.font.SysFont(self.unicode_font_name, TITLE_FONT_SIZE, bold=True)
+            self.subtitle_font = pygame.font.SysFont(self.unicode_font_name, SUBTITLE_FONT_SIZE, bold=True)
+            self.body_font = pygame.font.SysFont(self.unicode_font_name, BODY_FONT_SIZE)
+            self.small_font = pygame.font.SysFont(self.unicode_font_name, SMALL_FONT_SIZE)
+            self.piece_font = pygame.font.SysFont(self.unicode_font_name, int(SQUARE_SIZE * 0.7), bold=True)
+        except Exception:
+            self._load_fallback_fonts()
+    
+    def _load_fallback_fonts(self):
+        """Load fallback fonts for ASCII mode"""
+        try:
+            self.title_font = pygame.font.SysFont('Arial', TITLE_FONT_SIZE, bold=True)
+            self.subtitle_font = pygame.font.SysFont('Arial', SUBTITLE_FONT_SIZE, bold=True)
+            self.body_font = pygame.font.SysFont('Arial', BODY_FONT_SIZE)
+            self.small_font = pygame.font.SysFont('Arial', SMALL_FONT_SIZE)
+            self.piece_font = pygame.font.SysFont('Arial', int(SQUARE_SIZE * 0.8), bold=True)
+        except Exception:
+            # Final fallback to pygame default fonts
+            self.title_font = pygame.font.Font(None, TITLE_FONT_SIZE)
+            self.subtitle_font = pygame.font.Font(None, SUBTITLE_FONT_SIZE)
+            self.body_font = pygame.font.Font(None, BODY_FONT_SIZE)
+            self.small_font = pygame.font.Font(None, SMALL_FONT_SIZE)
+            self.piece_font = pygame.font.Font(None, int(SQUARE_SIZE * 0.8))
+    
+    def _setup_piece_symbols(self):
+        """Setup piece symbols based on Unicode support"""
+        # Unicode chess symbols (what we want to use)
+        self.unicode_symbols = {
             (WHITE_PIECE, KING): '♔',
             (WHITE_PIECE, QUEEN): '♕',
             (WHITE_PIECE, ROOK): '♖',
@@ -81,8 +103,8 @@ class Renderer:
             (BLACK_PIECE, PAWN): '♟',
         }
         
-        # Fallback ASCII letters (used when Unicode doesn't work)
-        self.fallback_ascii_symbols = {
+        # ASCII fallback symbols
+        self.ascii_symbols = {
             (WHITE_PIECE, KING): 'K',
             (WHITE_PIECE, QUEEN): 'Q',
             (WHITE_PIECE, ROOK): 'R',
@@ -96,19 +118,15 @@ class Renderer:
             (BLACK_PIECE, KNIGHT): 'n',
             (BLACK_PIECE, PAWN): 'p',
         }
-        
-        # Create surfaces for smooth rendering
-        self.board_surface = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
-        self.ui_surface = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
     
     def get_piece_symbol(self, piece):
         """Get the appropriate piece symbol based on font support"""
         # If we have Unicode support and it's enabled, use Unicode symbols
         if not USE_ASCII_PIECES and self.unicode_supported:
-            return self.piece_symbols.get((piece.color, piece.get_piece_type()), '?')
+            return self.unicode_symbols.get((piece.color, piece.get_piece_type()), '?')
         else:
             # Use ASCII letters as fallback
-            return self.fallback_ascii_symbols.get((piece.color, piece.get_piece_type()), '?')
+            return self.ascii_symbols.get((piece.color, piece.get_piece_type()), '?')
     
     def draw_gradient_background(self):
         """Draw beautiful gradient background"""
@@ -220,18 +238,15 @@ class Renderer:
         
         # Scale font for effects
         font_size = int(SQUARE_SIZE * 0.8 * scale)
-        if self.unicode_supported and self.piece_font:
+        if self.unicode_supported and self.unicode_font_name:
             # Use the Unicode-supporting font we found
             try:
-                scaled_font = pygame.font.SysFont(self.piece_font.get_ascent(), font_size, bold=True)
+                scaled_font = pygame.font.SysFont(self.unicode_font_name, font_size, bold=True)
             except:
                 scaled_font = self.piece_font
         else:
-            # Fallback font
-            try:
-                scaled_font = pygame.font.SysFont('Arial', font_size, bold=True)
-            except:
-                scaled_font = pygame.font.Font(None, font_size)
+            # Use the piece font we loaded
+            scaled_font = self.piece_font
         
         # Create outline effect for better visibility
         outline_positions = [(-1, -1), (-1, 1), (1, -1), (1, 1), (-1, 0), (1, 0), (0, -1), (0, 1)]
@@ -282,17 +297,15 @@ class Renderer:
         
         # Scale font for effects
         font_size = int(SQUARE_SIZE * 0.6 * scale)
-        try:
-            # Try fonts that support Unicode chess symbols
-            scaled_font = pygame.font.SysFont('DejaVu Sans', font_size, bold=True)
-        except:
+        if self.unicode_supported and self.unicode_font_name:
+            # Use the Unicode-supporting font we found
             try:
-                scaled_font = pygame.font.SysFont('Arial Unicode MS', font_size, bold=True)
+                scaled_font = pygame.font.SysFont(self.unicode_font_name, font_size, bold=True)
             except:
-                try:
-                    scaled_font = pygame.font.SysFont('Lucida Grande', font_size, bold=True)
-                except:
-                    scaled_font = pygame.font.Font(None, font_size)
+                scaled_font = self.piece_font
+        else:
+            # Use the piece font we loaded
+            scaled_font = self.piece_font
         
         # Draw piece symbol
         text_surface = scaled_font.render(symbol, True, text_color)
