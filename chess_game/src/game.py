@@ -136,11 +136,6 @@ class Game:
         self.board = Board()
         self.game_over = False
         self.winner = None
-    def reset_game(self):
-        """Reset the game to initial state"""
-        self.board = Board()
-        self.game_over = False
-        self.winner = None
         
         # If AI is enabled and it's black's turn, make AI move
         if self.use_ai and self.board.current_player == self.ai_color:
