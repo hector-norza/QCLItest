@@ -14,9 +14,11 @@ A beautiful, modern chess game implementation using Python and Pygame with enhan
 ### 🎨 Beautiful UI & Graphics
 - **Modern gradient backgrounds** with professional styling
 - **Elegant color palette** with cream and brown chess squares
+- **Beautiful Unicode chess symbols** (♔♕♖♗♘♙ vs ♚♛♜♝♞♟) with ASCII fallback
 - **Enhanced piece rendering** with two modes:
   - Solid white/black pieces with contrasting outlines
   - Pieces on colored circular backgrounds
+- **Configurable symbols**: Switch between Unicode chess pieces and ASCII letters
 - **Smooth 60 FPS animations** with pulsing highlights
 - **Professional UI panels** with rounded corners
 - **Visual feedback** for selections and valid moves
@@ -77,7 +79,22 @@ cd chess_game/src
 python3 main.py
 ```
 
-> **🎨 New!** Pieces now feature solid white and black colors for clear differentiation. See `PIECE_COLORS_REFERENCE.md` for rendering options.
+## ⚙️ Configuration Options
+
+### Piece Symbol Types
+Edit `src/constants.py` to customize:
+```python
+USE_ASCII_PIECES = True   # ASCII letters (K,Q,R,B,N,P vs k,q,r,b,n,p)
+USE_ASCII_PIECES = False  # Unicode symbols (♔♕♖♗♘♙ vs ♚♛♜♝♞♟)
+```
+
+### Rendering Modes
+```python
+USE_BACKGROUND_CIRCLES = False  # Outline pieces (default)
+USE_BACKGROUND_CIRCLES = True   # Pieces on colored backgrounds
+```
+
+> **🎨 ASCII pieces provide maximum compatibility** across all systems and fonts while maintaining clear visual distinction between white (uppercase) and black (lowercase) pieces.
 
 ## Controls
 

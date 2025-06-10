@@ -65,6 +65,7 @@ PIECE_VALUES = {
 
 # Rendering options
 USE_BACKGROUND_CIRCLES = False  # Set to True for background circle rendering, False for outline rendering
+USE_ASCII_PIECES = True         # Set to False for Unicode chess symbols, True for ASCII letters
 
 # UI Layout Constants
 UI_MARGIN = 20
