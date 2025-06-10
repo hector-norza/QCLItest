@@ -12,6 +12,7 @@ class Renderer:
         self.animation_time = 0
         self.unicode_font_name = None
         self.unicode_supported = False
+        self.game = None  # Reference to the game object
         
         # Test and load the best Unicode font
         self.unicode_font_name = self._find_best_unicode_font()
@@ -464,6 +465,13 @@ class Renderer:
         pygame.draw.circle(self.screen, indicator_color, (indicator_x + 15, player_y + 12), indicator_size)
         pygame.draw.circle(self.screen, border_color, (indicator_x + 15, player_y + 12), indicator_size, 2)
         
+        # AI status indicator
+        if hasattr(self, 'game') and self.game.use_ai:
+            ai_text = f"AI: {self.game.ai_player.difficulty.capitalize()}"
+            ai_color = UI_ACCENT
+            ai_surface = self.body_font.render(ai_text, True, ai_color)
+            self.screen.blit(ai_surface, (indicator_x + 40, player_y + 5))
+        
         # Game status with clean styling
         status_y = player_y + 35
         if hasattr(board, 'game_status'):
@@ -474,6 +482,8 @@ class Renderer:
                 status_color = UI_SUCCESS
             elif "check" in status_text:
                 status_color = UI_WARNING
+            elif "AI is thinking" in status_text:
+                status_color = UI_ACCENT
             else:
                 status_color = UI_TEXT
         else:
@@ -495,7 +505,7 @@ class Renderer:
     
     def draw_controls_panel(self, x, y, width):
         """Draw the controls panel with clean, modern styling without animations"""
-        height = 180
+        height = 200  # Increased height for more controls
         
         # Draw clean panel with simple styling
         panel_rect = pygame.Rect(x, y, width, height)
@@ -515,6 +525,8 @@ class Renderer:
             ("📍", "Click destination to move"),
             ("🔄", "R - Reset Game"),
             ("↩️", "Z - Undo Move"),
+            ("🤖", "A - Toggle AI opponent"),
+            ("🧠", "D - Cycle AI difficulty"),
             ("❌", "ESC - Quit"),
             ("💡", "Valid moves shown in green")
         ]

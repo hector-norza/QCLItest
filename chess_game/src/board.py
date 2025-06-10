@@ -12,6 +12,7 @@ class Board:
         self.valid_moves = []
         self.move_history = []
         self.game_status = "Game in progress"
+        self.ai_thinking = False  # Flag to indicate AI is thinking
         self.setup_initial_position()
         
     def setup_initial_position(self):
