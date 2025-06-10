@@ -14,29 +14,29 @@ WINDOW_HEIGHT = BOARD_HEIGHT + 120
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
-# Beautiful chess board colors
+# Modern chess board colors
 LIGHT_SQUARE = (240, 217, 181)     # Elegant cream
 DARK_SQUARE = (181, 136, 99)      # Warm brown
 BOARD_BORDER = (139, 69, 19)      # Saddle brown
 
-# Modern UI colors
+# Modern UI colors with enhanced palette
 UI_BACKGROUND = (248, 248, 250)   # Light gray background
 UI_PANEL = (255, 255, 255)       # Clean white panels
 UI_TEXT = (51, 51, 51)           # Dark gray text
-UI_ACCENT = (72, 133, 237)       # Modern blue
-UI_SUCCESS = (52, 168, 83)       # Green
-UI_WARNING = (251, 188, 5)       # Amber
-UI_ERROR = (234, 67, 53)         # Red
+UI_ACCENT = (66, 133, 244)       # Google blue
+UI_SUCCESS = (52, 168, 83)       # Google green
+UI_WARNING = (251, 188, 5)       # Google yellow
+UI_ERROR = (234, 67, 53)         # Google red
 
-# Enhanced game colors
+# Enhanced game colors with better visibility
 HIGHLIGHT_COLOR = (255, 235, 59, 180)    # Soft yellow highlight
 VALID_MOVE_COLOR = (76, 175, 80, 160)    # Gentle green
 SELECTED_COLOR = (255, 193, 7, 200)      # Golden selection
 LAST_MOVE_COLOR = (156, 39, 176, 120)    # Purple for last move
 
 # Gradient colors for modern look
-GRADIENT_START = (245, 245, 245)
-GRADIENT_END = (230, 230, 230)
+GRADIENT_START = (245, 245, 255)  # Slightly blue-tinted white
+GRADIENT_END = (225, 225, 240)    # Light blue-gray
 
 # Piece colors
 WHITE_PIECE = 'white'
